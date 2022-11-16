@@ -1,0 +1,56 @@
+created: 20221116082555250
+creator: matthias
+modified: 20221116082640666
+modifier: matthias
+revision: 2
+tags: $:/tags/Macro
+title: $:/custom/macros/AdventureOverviewToc
+type: text/vnd.tiddlywiki
+
+\define subtag(  ) tag[$(currentTiddler)$]
+
+\define tocTools( to )
+@@.tocTools
+<$link to="$to$" class="small"><i class="fas pull-left fa-border fa-link"></i></$link>
+@@
+\end
+
+\define smokeMirrors( selected )
+<$macrocall $name="tocTools" to={{$selected$}}/>
+\end
+
+\define toc-tabbed-internal-nav-mb( tag, sort:"", groups:"", selectedTiddler:"$:/temp/toc/selectedTiddler", unselectedText, missingText, template:"", height:"70vh" )
+<style>
+.colortext
+   { font-variant:small-caps; color: red; }
+.myTOC .tc-table-of-contents, .myTOC .tc-tabbed-table-of-contents-content
+   { height:$height$; max-height:$height$; overflow: hidden auto; }
+</style>
+<span class="myTOC">
+<$tiddler tiddler={{$selectedTiddler$}}>
+  <div class="tc-tabbed-table-of-contents">
+    <$linkcatcher to="$selectedTiddler$">
+      <div class="tc-table-of-contents">
+        <$list filter="$groups$">
+        ''<$text text=<<currentTiddler>> />''
+        <$macrocall $name="toc-selective-expandable" tag="""$tag$""" sort=<<subtag>> itemClassFilter=<<toc-tabbed-selected-item-filter selectedTiddler:"""$selectedTiddler$""">>/>
+        </$list>
+      </div>
+    </$linkcatcher>
+    <div class="tc-tabbed-table-of-contents-content">
+        <$reveal state="""$selectedTiddler$""" type="nomatch" text="">
+          <$transclude mode="block" tiddler="$template$">
+            <h1><<toc-caption>>  <<smokeMirrors $selectedTiddler$>></h1>
+            <$linkcatcher to="$selectedTiddler$">
+              <$transclude mode="block">$missingText$</$transclude>
+            </$linkcatcher>
+          </$transclude>
+        </$reveal>
+        <$reveal state="""$selectedTiddler$""" type="match" text="">
+          $unselectedText$
+        </$reveal>
+    </div>
+  </div>
+</$tiddler>
+</span>
+\end
